@@ -11,8 +11,8 @@
 <meta property="og:title" content="Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)" />
 <meta name="author" content="Pedro Demarchi Gomes" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Introdução" />
-<meta property="og:description" content="Introdução" />
+<meta name="description" content="1 Introdução" />
+<meta property="og:description" content="1 Introdução" />
 <link rel="canonical" href="/2024-08-29/ksm" />
 <meta property="og:url" content="/2024-08-29/ksm" />
 <meta property="og:site_name" content="Pedro Demarchi Gomes Blog" />
@@ -21,7 +21,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Pedro Demarchi Gomes"},"dateModified":"2024-08-29T16:56:13-03:00","datePublished":"2024-08-29T16:56:13-03:00","description":"Introdução","headline":"Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)","mainEntityOfPage":{"@type":"WebPage","@id":"/2024-08-29/ksm"},"url":"/2024-08-29/ksm"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Pedro Demarchi Gomes"},"dateModified":"2024-08-29T16:56:13-03:00","datePublished":"2024-08-29T16:56:13-03:00","description":"1 Introdução","headline":"Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)","mainEntityOfPage":{"@type":"WebPage","@id":"/2024-08-29/ksm"},"url":"/2024-08-29/ksm"}</script>
 <!-- End Jekyll SEO tag -->
 
 
@@ -75,15 +75,15 @@
   <h1 class="post-title">Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)</h1>
   <div class="post-line"></div>
 
-  <h1 id="introdução">Introdução</h1>
+  <h1 id="1-introdução">1 Introdução</h1>
 
 <p>Esse relatório apresenta o projeto de contribuição para o Kernel Linux desenvolvido durante a disciplina MO806A.</p>
 
 <p>O projeto consiste em desenvolver código para testar a performance da feature de economia de memória Kernel Samepage Merging (KSM) ao se utilizar huge pages. Esses testes são chamados de Kselftests, e estão contidos na árvore do Kernel.</p>
 
-<p>A seção kselftests apresenta o framework de testes Kselftest. As seções ksm e thp apresentam a feature KSM e o sistema de Transparent Huge Pages, respectivamente, para que na seção thpvsksm seja apresentado o problema que ocorre ao se habilitar os dois sistemas juntos. A contribuição, que está relacionada a esse problema, é apresentada na seção contribuicao.</p>
+<p>A seção 2 apresenta o framework de testes Kselftest. As seções 3 e 4 apresentam a feature KSM e o sistema de Transparent Huge Pages, respectivamente, para que na seção 5 seja apresentado o problema que ocorre ao se habilitar os dois sistemas juntos. A contribuição, que está relacionada a esse problema, é apresentada na seção 6.</p>
 
-<h1 id="kselftests">Kselftests</h1>
+<h1 id="2-kselftests">2 Kselftests</h1>
 
 <p>Os Kselftests são um conjunto de testes unitários e testes de regressão para o Kernel Linux<a class="citation" href="#KselftestsWiki">[1]</a> , que podem ser encontrados no diretório tools/testing/selftest na árvore do Kernel. Esses testes são executados diariamente em diversas árvores do Kernel.</p>
 
@@ -95,9 +95,9 @@
 
 <p>A árvore de desenvolvimento dos Kselftests é mantida pela desenvolvedora Shuah Khan, e pode ser encontrada em <a class="citation" href="#KselftestsTree">[2]</a></p>
 
-<h1 id="kernel-samepage-merging-ksm">Kernel Samepage Merging (KSM)</h1>
+<h1 id="3-kernel-samepage-merging-ksm">3 Kernel Samepage Merging (KSM)</h1>
 
-<p>Kernel Samepage Merging é uma feature de economia de memória do Kernel Linux. Quando ativada, o Kernel passa a varrer a memória em busca de páginas de memória iguais. Ao encontrar páginas duplicadas, uma delas é mantida e compartilhada entre os processos, as demais são liberadas, economizando o uso de memória. A página compartilhada pelos processos é marcada como copy on write (COW)<a class="citation" href="#KsmLwn">[3]</a>.</p>
+<p>Kernel Samepage Merging é uma feature de economia de memória do Kernel Linux. Quando ativada, o Kernel passa a varrer a memória em busca de páginas de memória iguais. Ao encontrar páginas duplicadas, uma delas é mantida e compartilhada entre os processos, e as demais são liberadas, economizando o uso de memória. A página compartilhada pelos processos é marcada como copy on write (COW)<a class="citation" href="#KsmLwn">[3]</a>.</p>
 
 <p>O KSM foi desenvolvido para ser utilizado em hosts que executam diversas máquinas virtuais. Nesses sistemas, uma parte significativa da memória utilizada pelos guests é idêntica, logo a ativação do KSM gera uma grande economia de memória.</p>
 
@@ -106,19 +106,23 @@
 <p><img src="/assets/ksm_vm.png" alt="" />
 <em>Máquina host com KSM ativado compartilhando páginas de máquinas virtuais <a class="citation" href="#anatomyKSM">[4]</a></em></p>
 
-<h1 id="transparent-huge-pages">Transparent Huge Pages</h1>
+<h1 id="4-transparent-huge-pages">4 Transparent Huge Pages</h1>
 
-<p>Transparent Huge Pages (THP) é um sistema implementado no Kernel Linux para utilizar huge pages de maneira transparente ao programador. Com esse sistema as páginas base, normalmente de tamanho 4K, são escaneadas e promovidas quando pertinente para huge pages, normalmente de tamanho 2MB. As huge pages também podem ser “quebradas” em páginas base quando for necessário.</p>
+<p>Transparent Huge Pages (THP) é um sistema implementado no Kernel Linux para utilizar huge pages, normalmente de 2MB de tamanho, de maneira transparente ao programador.</p>
+
+<p>Uma huge page é alocada, criada e mapeada na primeira falta de página em uma região alinhada em 2MB. Caso não exista uma região de memória contínua livre para a huge page, o comportamento padrão é compactar a memória para criá-la.</p>
+
+<p>Além disso, o Linux implementa o deamon khugepaged, que escaneia de maneira assíncrona as tabelas de página dos processos, em busca de regiões anônimas alinhadas em 2MB que contenham pelo menos uma página marcada como dirty, para serem juntadas para se criar uma huge page. As huge pages também podem ser “quebradas” em páginas base quando for necessário.</p>
 
 <p>O uso de huge pages diminui o número de páginas utilizadas pelas aplicações, o que diminui o número de TLB misses e aumenta o desempenho. <a class="citation" href="#hornyack">[5]</a> mostra que algumas aplicações podem passar 58% de seu tempo de execução tratando TLB misses. Logo, o uso de huge pages é essencial para aumentar o desempenho de diversas aplicações.</p>
 
-<h1 id="thp-vs-ksm">THP vs KSM</h1>
+<h1 id="5-thp-vs-ksm">5 THP vs KSM</h1>
 
 <p>Utilizar THP com KSM pode levar a uma grande queda de desempenho do sistema, devido ao KSM “quebrar” huge pages ao encontrar páginas base duplicadas dentro de uma huge page. Isso leva a um baixo uso de huge pages que pode anular seus benefícios, deixando para o sistema apenas o overhead do THP.</p>
 
 <p>Devido a esse problema diversas modificações, tanto no KSM quando no THP, estão sendo propostas. Pensando nisso, o projeto apresentado nesse relatório consiste em contribuir com testes para medir a velocidade do sistema de KSM utilizando THP.</p>
 
-<h1 id="contribuição">Contribuição</h1>
+<h1 id="6-contribuição">6 Contribuição</h1>
 
 <p>A contribuição realizada nesse projeto se deu no código do Kselftest que testa o KSM. Nele foi adicionado um parâmetro para testar a velocidade de compartilhamento de huge pages.</p>
 
@@ -134,7 +138,7 @@
 
 <p>As próximas subseções descrevem detalhes sobre o código e a interação com a comunidade ao contribuir.</p>
 
-<h2 id="código">Código</h2>
+<h2 id="61-código">6.1 Código</h2>
 
 <p>O teste para medir a velocidade de compartilhamento de páginas do KSM é simples. Ele se encontra em tools/testing/selftest/vm/ksm_tests.c, e recebe como parâmetros o tipo de teste e o tamanho da região de memória duplicada. Nele é medido o tempo de execução da função ksm_merge_pages, mostrada abaixo.</p>
 
@@ -178,7 +182,7 @@
     <span class="n">n_huge_pages</span><span class="o">++</span><span class="p">;</span>
 <span class="p">}</span></code></pre></figure>
 
-<p>A função allocate_transhuge, mostrada abaixo, utiliza a interface do Kernel Linux chamada pagemap<a class="citation" href="#pagemap">[6]</a>, que permite o usuário acessar a tabela de páginas de um programa, para verificar o tipo de página alocada. Ela pode ser acessada em /proc/$&lt;$pid$&gt;$/pagemap, sendo $&lt;$pid$&gt;$ o número de identificação do processo ou self, caso o processo queira acessar sua própria tabela de páginas.</p>
+<p>A função allocate_transhuge, mostrada abaixo, utiliza a interface do Kernel Linux chamada pagemap<a class="citation" href="#pagemap">[6]</a>, que permite o usuário acessar a tabela de páginas de um programa, para verificar o tipo de página alocada. Ela pode ser acessada em /proc/&lt;pid&gt;/pagemap, sendo &lt;pid&gt; o número de identificação do processo ou self, caso o processo queira acessar sua própria tabela de páginas.</p>
 
 <figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int64_t</span> <span class="nf">allocate_transhuge</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">pagemap_fd</span><span class="p">)</span>
 <span class="p">{</span>
@@ -214,7 +218,7 @@
 
 <p>A organização das páginas físicas de memória mapeadas por huge pages é detalhada em <a class="citation" href="#hugepageLwn">[7]</a>.</p>
 
-<p>Para executar esse teste basta compilar os Kselftests e executar sudo ./ksm_tests -H -s $&lt;$N$&gt;$, onde $N$ é o tamanho em MB da região duplicada, no diretório tools/testing/selftests/vm.</p>
+<p>Para executar esse teste basta compilar os Kselftests e executar sudo ./ksm_tests -H -s &lt;N&gt;, onde N é o tamanho em MB da região duplicada, no diretório tools/testing/selftests/vm.</p>
 
 <p>Um exemple de saída do teste com uma região duplicada de 100MB é apresentado abaixo.</p>
 
@@ -226,7 +230,7 @@
 
 <p>O código completo do teste pode ser encontrado em <a class="citation" href="#kernelKSM">[8]</a>.</p>
 
-<h2 id="comunidade">Comunidade</h2>
+<h2 id="62-comunidade">6.2 Comunidade</h2>
 
 <p>Os patches foram enviados para os emails obtidos através do script get_maintainer.pl.</p>
 
@@ -236,7 +240,7 @@
 
 <p>Após ser aplicado no Mainline Kernel, o patch também foi aplicado na árvore de desenvolvimento dos Kselftests.</p>
 
-<h1 id="conclusão">Conclusão</h1>
+<h1 id="7-conclusão">7 Conclusão</h1>
 
 <p>Esse projeto possibilitou o contato com a comunidade de desenvolvedores do Kernel Linux, o aprendizado das ferramentas utilizadas para fazer uma contribuição e para testar alterações no Kernel, e principalmente o aprendizado do funcionamento do sistema de gerenciamento de memória.</p>
 
@@ -628,7 +632,7 @@ diff --git a/tools/testing/selftests/vm/ksm_tests.c b/tools/testing/selftests/vm
 
     <footer>
   <span>
-    &copy; <time datetime="2024-08-30 03:18:38 -0300">2024</time> . Made with Jekyll using the <a href="https://github.com/chesterhow/tale/">Tale</a> theme.
+    &copy; <time datetime="2024-09-03 11:04:59 -0300">2024</time> . Made with Jekyll using the <a href="https://github.com/chesterhow/tale/">Tale</a> theme.
   </span>
 </footer>
 
