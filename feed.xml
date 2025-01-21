@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2025-01-21T12:10:05-03:00</updated><id>/feed.xml</id><title type="html">Pedro Demarchi Gomes Blog</title><subtitle>My little blog about programming.</subtitle><entry><title type="html">A parallel implementation of the Smith-Waterman algorithm</title><link href="/2024-11-28/Smith-Waterman-algorithm" rel="alternate" type="text/html" title="A parallel implementation of the Smith-Waterman algorithm" /><published>2024-11-28T16:56:13-03:00</published><updated>2024-11-28T16:56:13-03:00</updated><id>/2024-11-28/Smith-Waterman-algorithm</id><content type="html" xml:base="/2024-11-28/Smith-Waterman-algorithm"><![CDATA[<p>The Smith-Waterman algorithm performs local sequence alignment; that is, for determining similar regions between two strings of nucleic acid sequences or protein sequences. Instead of looking at the entire sequence, the Smith-Waterman algorithm compares segments of all possible lengths and optimizes the similarity measure.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2025-01-21T12:19:39-03:00</updated><id>/feed.xml</id><title type="html">Pedro Demarchi Gomes Blog</title><subtitle>My little blog about programming.</subtitle><entry><title type="html">A parallel implementation of the Smith-Waterman algorithm</title><link href="/2024-11-28/Smith-Waterman-algorithm" rel="alternate" type="text/html" title="A parallel implementation of the Smith-Waterman algorithm" /><published>2024-11-28T16:56:13-03:00</published><updated>2024-11-28T16:56:13-03:00</updated><id>/2024-11-28/Smith-Waterman-algorithm</id><content type="html" xml:base="/2024-11-28/Smith-Waterman-algorithm"><![CDATA[<p>The Smith-Waterman algorithm performs local sequence alignment; that is, for determining similar regions between two strings of nucleic acid sequences or protein sequences. Instead of looking at the entire sequence, the Smith-Waterman algorithm compares segments of all possible lengths and optimizes the similarity measure.</p>
 
 <p>To reduce its execution time, I implemented two parallel versions of the algorithm. One of them using OpenMP, for shared-memory parallel computing on multi-core processors, and the other using MPI, for parallel computing on distributed memory environments.</p>
 
@@ -183,7 +183,7 @@ make sure to get at least 2 full scans */</span>
 <li><span id="Patch">[9]Patch desenvolvido no projeto. https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/tools/testing/selftests/vm/ksm_tests.c?id=325254899684adf32b95ae59000dec4a6853e930.</span></li>
 <li><span id="LWN">[10]LWN. https://lwn.net/.</span></li></ol>
 
-<h1 id="apêndice-a">Apêndice A</h1>
+<h1 id="appendix-a">Appendix A</h1>
 
 <p>This appendix presents the first version of the patch developed in the project.</p>
 
@@ -340,7 +340,7 @@ diff --git a/tools/testing/selftests/vm/ksm_tests.c b/tools/testing/selftests/vm
 </span>
 </code></pre></div></div>
 
-<h1 id="apêndice-b">Apêndice B</h1>
+<h1 id="appendix-b">Appendix B</h1>
 
 <p>This appendix presents the second version of the patch developed in the project.</p>
 
