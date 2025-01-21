@@ -1,8 +1,545 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2024-11-28T17:08:40-03:00</updated><id>/feed.xml</id><title type="html">Pedro Demarchi Gomes Blog</title><subtitle>My little blog about programming.</subtitle><entry><title type="html">A parallel implementation of the Smith-Waterman algorithm</title><link href="/2024-11-28/Smith-Waterman-algorithm" rel="alternate" type="text/html" title="A parallel implementation of the Smith-Waterman algorithm" /><published>2024-11-28T16:56:13-03:00</published><updated>2024-11-28T16:56:13-03:00</updated><id>/2024-11-28/Smith-Waterman-algorithm</id><content type="html" xml:base="/2024-11-28/Smith-Waterman-algorithm"><![CDATA[<p>The Smith-Waterman algorithm performs local sequence alignment; that is, for determining similar regions between two strings of nucleic acid sequences or protein sequences. Instead of looking at the entire sequence, the Smith-Waterman algorithm compares segments of all possible lengths and optimizes the similarity measure.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2025-01-21T12:10:05-03:00</updated><id>/feed.xml</id><title type="html">Pedro Demarchi Gomes Blog</title><subtitle>My little blog about programming.</subtitle><entry><title type="html">A parallel implementation of the Smith-Waterman algorithm</title><link href="/2024-11-28/Smith-Waterman-algorithm" rel="alternate" type="text/html" title="A parallel implementation of the Smith-Waterman algorithm" /><published>2024-11-28T16:56:13-03:00</published><updated>2024-11-28T16:56:13-03:00</updated><id>/2024-11-28/Smith-Waterman-algorithm</id><content type="html" xml:base="/2024-11-28/Smith-Waterman-algorithm"><![CDATA[<p>The Smith-Waterman algorithm performs local sequence alignment; that is, for determining similar regions between two strings of nucleic acid sequences or protein sequences. Instead of looking at the entire sequence, the Smith-Waterman algorithm compares segments of all possible lengths and optimizes the similarity measure.</p>
 
 <p>To reduce its execution time, I implemented two parallel versions of the algorithm. One of them using OpenMP, for shared-memory parallel computing on multi-core processors, and the other using MPI, for parallel computing on distributed memory environments.</p>
 
-<p>You can check the source code of the OpenMP version <a href="https://github.com/pedrodemargomes/SmitWaterman">here</a>, and the MPI version <a href="https://github.com/pedrodemargomes/SmitWatermanMPI">here</a></p>]]></content><author><name>Pedro Demarchi Gomes</name></author><category term="parallel" /><category term="computing" /><summary type="html"><![CDATA[The Smith-Waterman algorithm performs local sequence alignment; that is, for determining similar regions between two strings of nucleic acid sequences or protein sequences. Instead of looking at the entire sequence, the Smith-Waterman algorithm compares segments of all possible lengths and optimizes the similarity measure.]]></summary></entry><entry><title type="html">Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)</title><link href="/2024-08-29/ksm" rel="alternate" type="text/html" title="Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)" /><published>2024-08-29T16:56:13-03:00</published><updated>2024-08-29T16:56:13-03:00</updated><id>/2024-08-29/ksm</id><content type="html" xml:base="/2024-08-29/ksm"><![CDATA[<h1 id="1-introdução">1 Introdução</h1>
+<p>You can check the source code of the OpenMP version <a href="https://github.com/pedrodemargomes/SmitWaterman">here</a>, and the MPI version <a href="https://github.com/pedrodemargomes/SmitWatermanMPI">here</a></p>]]></content><author><name>Pedro Demarchi Gomes</name></author><category term="parallel" /><category term="computing" /><summary type="html"><![CDATA[The Smith-Waterman algorithm performs local sequence alignment; that is, for determining similar regions between two strings of nucleic acid sequences or protein sequences. Instead of looking at the entire sequence, the Smith-Waterman algorithm compares segments of all possible lengths and optimizes the similarity measure.]]></summary></entry><entry><title type="html">Developing a performance test for Kernel Samepage Merging (KSM)</title><link href="/2024-08-29/ksm-en" rel="alternate" type="text/html" title="Developing a performance test for Kernel Samepage Merging (KSM)" /><published>2024-08-29T16:56:13-03:00</published><updated>2024-08-29T16:56:13-03:00</updated><id>/2024-08-29/ksm-en</id><content type="html" xml:base="/2024-08-29/ksm-en"><![CDATA[<h1 id="1-introduction">1 Introduction</h1>
+
+<p>This report presents the contribution project for the Linux Kernel developed during the MO806A course.</p>
+
+<p>The project consists of developing code to test the performance of the memory-saving feature Kernel Samepage Merging (KSM) when using huge pages. These tests are called Kselftests, and are contained in the Kernel tree.</p>
+
+<p>Section 2 presents the Kselftest testing framework. Sections 3 and 4 present the KSM feature and the Transparent Huge Pages system, respectively, so that in section 5 the problem that occurs when enabling both systems together is presented. The contribution, which is related to this problem, is presented in section 6.</p>
+
+<h1 id="2-kselftests">2 Kselftests</h1>
+
+<p>Kselftests are a set of unit tests and regression tests for the Linux Kernel<a class="citation" href="#KselftestsWiki">[1]</a> , which can be found in the tools/testing/selftest directory in the Kernel tree. These tests are executed daily on several Kernel trees.</p>
+
+<p>Each test aims to execute specific code paths in order to find bugs and regressions.</p>
+
+<p>The tests are organized into groups, where each one tests a different part of the Kernel (memory, scheduler, KVM, etc.). The user can run all the tests, just a group of tests, or just a specific test.</p>
+
+<p>One of the requirements of Kselftests is that the execution time of all the tests does not exceed 20 minutes.</p>
+
+<p>The Kselftests development tree is maintained by developer Shuah Khan, and can be found at <a class="citation" href="#KselftestsTree">[2]</a></p>
+
+<h1 id="3-kernel-samepage-merging-ksm">3 Kernel Samepage Merging (KSM)</h1>
+
+<p>Kernel Samepage Merging is a memory-saving feature of the Linux Kernel. When enabled, the Kernel scans the memory for identical memory pages. When it finds duplicate pages, one of them is kept and shared between processes, and the others are released, saving memory usage. The page shared by the processes is marked as copy on write (COW)<a class="citation" href="#KsmLwn">[3]</a>.</p>
+
+<p>KSM was developed to be used on hosts that run several virtual machines. In these systems, a significant part of the memory used by the guests is identical, so activating KSM generates a large memory saving.</p>
+
+<p>The figure below shows a representation of a physical machine, using KSM, running three virtual machines. Part of the pages used by the virtual machines are shared by KSM, and the rest are private to each virtual machine.</p>
+
+<p><img src="/assets/ksm_vm.png" alt="" />
+<em>Host machine with KSM activated sharing pages of virtual machines <a class="citation" href="#anatomyKSM">[4]</a></em></p>
+
+<h1 id="4-transparent-huge-pages">4 Transparent Huge Pages</h1>
+
+<p>Transparent Huge Pages (THP) is a system implemented in the Linux Kernel to use huge pages, normally 2MB in size, in a way that is transparent to the programmer.</p>
+
+<p>A huge page is allocated, created, and mapped at the first page fault in a 2MB-aligned region. If there is no free contiguous memory region for the huge page, the default behavior is to compact the memory to create it.</p>
+
+<p>In addition, Linux implements the khugepaged daemon, which asynchronously scans the page tables of processes, looking for anonymous 2MB-aligned regions that contain at least one page marked as dirty, to be combined to create a huge page. Huge pages can also be “broken” into base pages when necessary.</p>
+
+<p>Using huge pages reduces the number of pages used by applications, which reduces the number of TLB misses and increases performance. <a class="citation" href="#hornyack">[5]</a> shows that some applications can spend 58% of their execution time handling TLB misses. Therefore, the use of huge pages is essential to increase the performance of many applications.</p>
+
+<h1 id="5-thp-vs-ksm">5 THP vs KSM</h1>
+
+<p>Using THP with KSM can lead to a significant drop in system performance, as KSM “breaks” huge pages when it finds duplicate base pages within a huge page. This leads to low usage of huge pages, which can negate their benefits, leaving the system with only the overhead of THP.</p>
+
+<p>Due to this problem, several modifications to both KSM and THP are being proposed. With this in mind, the project presented in this report consists of contributing tests to measure the speed of the KSM system using THP.</p>
+
+<h1 id="6-contribution">6 Contribution</h1>
+
+<p>The contribution made to this project was in the Kselftest code that tests KSM. A parameter was added to test the speed of sharing huge pages.</p>
+
+<p>The purpose of this test is to help KSM system developers by evaluating the system’s performance when interacting with huge pages.</p>
+
+<p>Contributions to the Linux Kernel are made through patches, which are sent to email lists. There are several email lists, and each one receives patches for different parts of the Kernel.</p>
+
+<p>The patches are managed by the maintainers, who are responsible for approving them, rejecting them, or suggesting improvements. Each maintainer has a Kernel tree where, if the patch is approved, it is applied.</p>
+
+<p>There are several maintainers, responsible for managing the development of different parts of the Kernel.</p>
+
+<p>To find out which email list to send a patch to, simply run the get_maintainer.pl script, which is found in the Kernel tree, passing the path to your patch as a parameter. It will return the name and email of the maintainers and the mailing lists to which the patch should be sent.</p>
+
+<p>The following subsections describe details about the code and the interaction with the community when contributing.</p>
+
+<h2 id="61-code">6.1 Code</h2>
+
+<p>The test to measure the speed of KSM page sharing is simple. It is located in tools/testing/selftest/vm/ksm_tests.c, and receives as parameters the type of test and the size of the duplicated memory region. It measures the execution time of the ksm_merge_pages function, shown below.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="k">static</span> <span class="kt">int</span> <span class="nf">ksm_merge_pages</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">addr</span><span class="p">,</span> <span class="kt">size_t</span> <span class="n">size</span><span class="p">,</span>
+<span class="k">struct</span> <span class="n">timespec</span> <span class="n">start_time</span><span class="p">,</span> <span class="kt">int</span> <span class="n">timeout</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">madvise</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">MADV_MERGEABLE</span><span class="p">))</span> <span class="p">{</span>
+<span class="n">perror</span><span class="p">(</span><span class="s">"madvise"</span><span class="p">);</span>
+<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">ksm_write_sysfs</span><span class="p">(</span><span class="n">KSM_FP</span><span class="p">(</span><span class="s">"run"</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="cm">/* Since merging occurs only after 2 scans,
+make sure to get at least 2 full scans */</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">ksm_do_scan</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">timeout</span><span class="p">))</span>
+<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+
+<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>This function first enables the memory region used in the test to be scanned by KSM. Then, it executes KSM. Finally, it commands KSM to scan the memory twice, since only the second time does page sharing occur.</p>
+
+<p>To add the option to test the speed of sharing huge pages, simply allocate the memory region to be shared using huge pages.</p>
+
+<p>Two versions of the patch were developed, the first and second versions can be found in appendices A and B, respectively.</p>
+
+<p>In the first version, the madvise system call is used to allocate the memory region to be tested with huge pages. However, this method means that there is no control over the number of huge pages that were allocated to that region, which can interfere with the tests.</p>
+
+<p>In the second version, the allocate_transhuge function is used to allocate the huge pages. This function attempts to allocate huge pages and returns -1 if it is not successful. This way, it is possible to know how many huge pages were allocated in the region. The number of normal pages and huge pages allocated is informed to the user.</p>
+
+<p>The memory is allocated in chunks of size HPAGE_SIZE, which corresponds to the size of a Huge Page, as shown in the code snippet below. The allocate_transhuge function is called for each chunk, and according to its return, the number of allocated pages of each type is counted.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">n_normal_pages</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="n">n_huge_pages</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">map_ptr</span><span class="p">;</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="n">map_ptr</span> <span class="o">+</span> <span class="n">len</span><span class="p">;</span>
+<span class="n">p</span> <span class="o">+=</span> <span class="n">HPAGE_SIZE</span><span class="p">)</span> <span class="p">{</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">allocate_transhuge</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">pagemap_fd</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">n_normal_pages</span><span class="o">++</span><span class="p">;</span>
+<span class="k">else</span>
+<span class="n">n_huge_pages</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>The allocate_transhuge function, shown below, uses the Linux kernel interface called pagemap<a class="citation" href="#pagemap">[6]</a>, which allows the user to access a program’s page table to check the type of page allocated. It can be accessed in /proc/&lt;pid&gt;/pagemap, where &lt;pid&gt; is the process identification number or self, if the process wants to access its own page table.</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="kt">int64_t</span> <span class="nf">allocate_transhuge</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">ptr</span><span class="p">,</span> <span class="kt">int</span> <span class="n">pagemap_fd</span><span class="p">)</span>
+<span class="p">{</span>
+ <span class="kt">uint64_t</span> <span class="n">ent</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+
+ <span class="cm">/* drop pmd */</span>
+ <span class="k">if</span> <span class="p">(</span><span class="n">mmap</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">HPAGE_SIZE</span><span class="p">,</span> <span class="n">PROT_READ</span> <span class="o">|</span> <span class="n">PROT_WRITE</span><span class="p">,</span>
+ <span class="n">MAP_FIXED</span> <span class="o">|</span> <span class="n">MAP_ANONYMOUS</span> <span class="o">|</span>
+ <span class="n">MAP_NORESERVE</span> <span class="o">|</span> <span class="n">MAP_PRIVATE</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ptr</span><span class="p">)</span>
+ <span class="n">errx</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">"mmap transhuge"</span><span class="p">);</span>
+
+ <span class="k">if</span> <span class="p">(</span><span class="n">madvise</span><span class="p">(</span><span class="n">ptr</span><span class="p">,</span> <span class="n">HPAGE_SIZE</span><span class="p">,</span> <span class="n">MADV_HUGEPAGE</span><span class="p">))</span>
+ <span class="n">err</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">"MADV_HUGEPAGE"</span><span class="p">);</span>
+
+ <span class="cm">/* allocate transparent huge page */</span>
+ <span class="o">*</span><span class="p">(</span><span class="k">volatile</span> <span class="kt">void</span> <span class="o">**</span><span class="p">)</span><span class="n">ptr</span> <span class="o">=</span> <span class="n">ptr</span><span class="p">;</span>
+
+ <span class="k">if</span> <span class="p">(</span><span class="n">pread</span><span class="p">(</span><span class="n">pagemap_fd</span><span class="p">,</span> <span class="n">ent</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ent</span><span class="p">),</span>
+<span class="p">(</span><span class="kt">uintptr_t</span><span class="p">)</span><span class="n">ptr</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="n">PAGE_SHIFT</span> <span class="o">-</span> <span class="mi">3</span><span class="p">))</span> <span class="o">!=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">ent</span><span class="p">))</span>
+<span class="n">err</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">"read pagemap"</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="n">PAGEMAP_PRESENT</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+<span class="n">PAGEMAP_PRESENT</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+<span class="n">PAGEMAP_PFN</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">==</span> <span class="n">PAGEMAP_PFN</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+<span class="o">!</span><span class="p">(</span><span class="n">PAGEMAP_PFN</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span>
+<span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">HPAGE_SHIFT</span> <span class="o">-</span> <span class="n">PAGE_SHIFT</span><span class="p">))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="k">return</span> <span class="n">PAGEMAP_PFN</span><span class="p">(</span><span class="n">ent</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+
+<span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>First, the information of the physical page mapped by the virtual address ptr and its successor are stored in the array ent. For a huge page to be allocated, both pages must be present, i.e., not in swap, the Page Frame Number (PFN) of the second page must be the successor of the first, and the PFN of the first page must be a multiple of 512, since a huge page has 512 normal pages.</p>
+
+<p>The organization of the physical memory pages mapped by huge pages is detailed in <a class="citation" href="#hugepageLwn">[7]</a>.</p>
+
+<p>To run this test, simply compile Kselftests and run sudo ./ksm_tests -H -s &lt;N&gt;, where N is the size in MB of the duplicated region, in the tools/testing/selftests/vm directory.</p>
+
+<p>An example of the test output with a 100MB duplicated region is shown below.</p>
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="n">Number</span> <span class="n">of</span> <span class="n">normal</span> <span class="n">pages</span><span class="o">:</span> <span class="mi">0</span>
+<span class="n">Number</span> <span class="n">of</span> <span class="n">huge</span> <span class="n">pages</span><span class="o">:</span> <span class="mi">50</span>
+<span class="n">Total</span> <span class="n">size</span><span class="o">:</span> <span class="mi">100</span> <span class="n">MiB</span>
+<span class="n">Total</span> <span class="n">time</span><span class="o">:</span> <span class="mi">0</span><span class="p">.</span><span class="mi">178690991</span> <span class="n">s</span>
+<span class="n">Average</span> <span class="n">speed</span><span class="o">:</span> <span class="mi">559</span><span class="p">.</span><span class="mi">625</span> <span class="n">MiB</span><span class="o">/</span><span class="n">s</span></code></pre></figure>
+
+<p>The full test code can be found at <a class="citation" href="#kernelKSM">[8]</a>.</p>
+
+<h2 id="62-community">6.2 Community</h2>
+
+<p>The patches were sent to the emails obtained through the get_maintainer.pl script.</p>
+
+<p>The first version of the patch sent received no responses, and a few days later the second version was sent.</p>
+
+<p>The second version was first applied to the linux-mm tree of the Kernel, which receives patches related to the memory system. It was then selected by its maintainer Andrew Morton to be sent to the Mainline Kernel, and was applied to Kernel v5.16-rc3. The commit in which the patch was applied can be found at <a class="citation" href="#Patch">[9]</a>.</p>
+
+<p>After being applied to the Mainline Kernel, the patch was also applied to the Kselftests development tree.</p>
+
+<h1 id="7-conclusion">7 Conclusion</h1>
+
+<p>This project made it possible to get in touch with the Linux Kernel developer community, to learn the tools used to make a contribution and to test changes to the Kernel, and mainly to learn how the memory management system works.</p>
+
+<p>In addition to the contribution itself, reading mailing lists and information portals about the Linux Kernel, such as LWN.net<a class="citation" href="#LWN">[10]</a>, throughout the development of the project, helped to follow the discussion process that occurs until a major change is applied to the Mainline Kernel.</p>
+
+<ol class="bibliography"><li><span id="KselftestsWiki">[1]Kselftests wiki. https://kselftest.wiki.kernel.org/.</span></li>
+<li><span id="KselftestsTree">[2]Kselftests tree. git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git/tree/tools/testing/selftests.</span></li>
+<li><span id="KsmLwn">[3]/dev/ksm: dynamic memory sharing. https://lwn.net/Articles/306704/.</span></li>
+<li><span id="anatomyKSM">[4]Archived | Anatomy of Linux Kernel Shared Memory. https://developer.ibm.com/tutorials/l-kernel-shared-memory/.</span></li>
+<li><span id="hornyack">[5]Hornyack, P. et al. 2015. A Study of Virtual Memory Usage and Implications for Large Memory. (2015).</span></li>
+<li><span id="pagemap">[6]Examining Process Page Tables. https://www.kernel.org/doc/html/latest/admin-guide/mm/pagemap.html.</span></li>
+<li><span id="hugepageLwn">[7]Reducing page structures for huge pages. https://lwn.net/Articles/839737/.</span></li>
+<li><span id="kernelKSM">[8]KSM Tests. https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/testing/selftests/vm/ksm_tests.c.</span></li>
+<li><span id="Patch">[9]Patch desenvolvido no projeto. https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/tools/testing/selftests/vm/ksm_tests.c?id=325254899684adf32b95ae59000dec4a6853e930.</span></li>
+<li><span id="LWN">[10]LWN. https://lwn.net/.</span></li></ol>
+
+<h1 id="apêndice-a">Apêndice A</h1>
+
+<p>This appendix presents the first version of the patch developed in the project.</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">Signed-off-by: Pedro Demarchi Gomes &lt;pedrodemargomes@gmail.com&gt;
+---
+</span> tools/testing/selftests/vm/ksm_tests.c | 40 +++++++++++++++++++-------
+ 1 file changed, 30 insertions(+), 10 deletions(-)
+
+diff --git a/tools/testing/selftests/vm/ksm_tests.c b/tools/testing/selftests/vm/ksm_tests.c
+<span class="gh">index b61dcdb44c5b..92b716565d9c 100644
+</span><span class="gd">--- a/tools/testing/selftests/vm/ksm_tests.c
+</span><span class="gi">+++ b/tools/testing/selftests/vm/ksm_tests.c
+</span><span class="p">@@ -5,6 +5,7 @@</span>
+ #include &lt;time.h&gt;
+ #include &lt;string.h&gt;
+ #include &lt;numa.h&gt;
+<span class="gi">+#include &lt;err.h&gt;
+</span>
+ #include "../kselftest.h"
+ #include "../../../../include/vdso/time64.h"
+<span class="p">@@ -34,7 +35,8 @@</span> enum ksm_test_name {
+        CHECK_KSM_ZERO_PAGE_MERGE,
+        CHECK_KSM_NUMA_MERGE,
+        KSM_MERGE_TIME,
+<span class="gd">-       KSM_COW_TIME
+</span><span class="gi">+       KSM_COW_TIME,
++       KSM_MERGE_TIME_HUGE_PAGES
+</span> };
+
+ static int ksm_write_sysfs(const char *file_path, unsigned long val)
+<span class="p">@@ -99,6 +101,9 @@</span> static void print_help(void)
+               " -U (page unmerging)\n"
+               " -P evaluate merging time and speed.\n"
+               "    For this test, the size of duplicated memory area (in MiB)\n"
+<span class="gi">+              "    must be provided using -s option\n"
++                  " -H evaluate merging time and speed of huge pages.\n"
++              "    For this test, the size of duplicated memory area (in MiB)\n"
+</span>               "    must be provided using -s option\n"
+               " -C evaluate the time required to break COW of merged pages.\n\n");
+
+@@ -118,10 +123,14 @@ static void print_help(void)
+        exit(0);
+ }
+
+-static void  *allocate_memory(void *ptr, int prot, int mapping, char data, size_t map_size)
+<span class="gi">+static void  *allocate_memory(void *ptr, int prot, int mapping, char data, size_t map_size,
++                                bool huge_page)
+</span> {
+        void *map_ptr = mmap(ptr, map_size, PROT_WRITE, mapping, -1, 0);
+
++       if (huge_page &amp;&amp; madvise(map_ptr, map_size, MADV_HUGEPAGE))
+<span class="gi">+               err(2, "MADV_HUGEPAGE");
++
+</span>        if (!map_ptr) {
+                perror("mmap");
+                return NULL;
+<span class="p">@@ -250,7 +259,7 @@</span> static int check_ksm_merge(int mapping, int prot, long page_count, int timeout,
+        }
+
+        /* fill pages with the same data and merge them */
+<span class="gd">-       map_ptr = allocate_memory(NULL, prot, mapping, '*', page_size * page_count);
+</span><span class="gi">+       map_ptr = allocate_memory(NULL, prot, mapping, '*', page_size * page_count, false);
+</span>        if (!map_ptr)
+                return KSFT_FAIL;
+
+@@ -282,7 +291,7 @@ static int check_ksm_unmerge(int mapping, int prot, int timeout, size_t page_siz
+        }
+
+        /* fill pages with the same data and merge them */
+<span class="gd">-       map_ptr = allocate_memory(NULL, prot, mapping, '*', page_size * page_count);
+</span><span class="gi">+       map_ptr = allocate_memory(NULL, prot, mapping, '*', page_size * page_count, false);
+</span>        if (!map_ptr)
+                return KSFT_FAIL;
+
+@@ -325,7 +334,7 @@ static int check_ksm_zero_page_merge(int mapping, int prot, long page_count, int
+                return KSFT_FAIL;
+
+        /* fill pages with zero and try to merge them */
+<span class="gd">-       map_ptr = allocate_memory(NULL, prot, mapping, 0, page_size * page_count);
+</span><span class="gi">+       map_ptr = allocate_memory(NULL, prot, mapping, 0, page_size * page_count, false);
+</span>        if (!map_ptr)
+                return KSFT_FAIL;
+
+@@ -416,7 +425,7 @@ static int check_ksm_numa_merge(int mapping, int prot, int timeout, bool merge_a
+        return KSFT_FAIL;
+ }
+
+-static int ksm_merge_time(int mapping, int prot, int timeout, size_t map_size)
+<span class="gi">+static int ksm_merge_time(int mapping, int prot, int timeout, size_t map_size, bool huge_page)
+</span> {
+        void *map_ptr;
+        struct timespec start_time, end_time;
+<span class="p">@@ -424,7 +433,7 @@</span> static int ksm_merge_time(int mapping, int prot, int timeout, size_t map_size)
+
+        map_size *= MB;
+
+-       map_ptr = allocate_memory(NULL, prot, mapping, '*', map_size);
+<span class="gi">+       map_ptr = allocate_memory(NULL, prot, mapping, '*', map_size, huge_page);
+</span>        if (!map_ptr)
+                return KSFT_FAIL;
+
+@@ -466,7 +475,7 @@ static int ksm_cow_time(int mapping, int prot, int timeout, size_t page_size)
+        /* page_count must be less than 2*page_size */
+        size_t page_count = 4000;
+
+-       map_ptr = allocate_memory(NULL, prot, mapping, '*', page_size * page_count);
+<span class="gi">+       map_ptr = allocate_memory(NULL, prot, mapping, '*', page_size * page_count, false);
+</span>        if (!map_ptr)
+                return KSFT_FAIL;
+
+@@ -541,7 +550,7 @@ int main(int argc, char *argv[])
+        bool merge_across_nodes = KSM_MERGE_ACROSS_NODES_DEFAULT;
+        long size_MB = 0;
+
+-       while ((opt = getopt(argc, argv, "ha:p:l:z:m:s:MUZNPC")) != -1) {
+<span class="gi">+       while ((opt = getopt(argc, argv, "ha:p:l:z:m:s:MUZNPCH")) != -1) {
+</span>                switch (opt) {
+                case 'a':
+                        prot = str_to_prot(optarg);
+<span class="p">@@ -598,6 +607,9 @@</span> int main(int argc, char *argv[])
+                case 'C':
+                        test_name = KSM_COW_TIME;
+                        break;
+<span class="gi">+               case 'H':
++                       test_name = KSM_MERGE_TIME_HUGE_PAGES;
++                       break;
+</span>                default:
+                        return KSFT_FAIL;
+                }
+<span class="p">@@ -645,12 +657,20 @@</span> int main(int argc, char *argv[])
+                        return KSFT_FAIL;
+                }
+                ret = ksm_merge_time(MAP_PRIVATE | MAP_ANONYMOUS, prot, ksm_scan_limit_sec,
+<span class="gd">-                                    size_MB);
+</span><span class="gi">+                                    size_MB, false);
+</span>                break;
+        case KSM_COW_TIME:
+                ret = ksm_cow_time(MAP_PRIVATE | MAP_ANONYMOUS, prot, ksm_scan_limit_sec,
+                                   page_size);
+                break;
+<span class="gi">+       case KSM_MERGE_TIME_HUGE_PAGES:
++               if (size_MB == 0) {
++                       printf("Option '-s' is required.\n");
++                       return KSFT_FAIL;
++               }
++               ret = ksm_merge_time(MAP_PRIVATE | MAP_ANONYMOUS, prot, ksm_scan_limit_sec,
++                                    size_MB, true);
++               break;
+</span>        }
+
+        if (ksm_restore(&amp;ksm_sysfs_old)) {
+<span class="gd">-- 
+</span><span class="p">2.25.1
+</span>
+</code></pre></div></div>
+
+<h1 id="apêndice-b">Apêndice B</h1>
+
+<p>This appendix presents the second version of the patch developed in the project.</p>
+
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Add test case of KSM merging time using mostly huge pages
+
+Signed-off-by: Pedro Demarchi Gomes &lt;pedrodemargomes@gmail.com&gt;
+<span class="p">---
+</span> tools/testing/selftests/vm/ksm_tests.c | 125 ++++++++++++++++++++++++-
+ 1 file changed, 124 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/vm/ksm_tests.c b/tools/testing/selftests/vm/ksm_tests.c
+<span class="gh">index b61dcdb44c5b..61f3360a19df 100644
+</span><span class="gd">--- a/tools/testing/selftests/vm/ksm_tests.c
+</span><span class="gi">+++ b/tools/testing/selftests/vm/ksm_tests.c
+</span><span class="p">@@ -5,6 +5,10 @@</span>
+ #include &lt;time.h&gt;
+ #include &lt;string.h&gt;
+ #include &lt;numa.h&gt;
+<span class="gi">+#include &lt;unistd.h&gt;
++#include &lt;fcntl.h&gt;
++#include &lt;stdint.h&gt;
++#include &lt;err.h&gt;
+</span> 
+ #include "../kselftest.h"
+ #include "../../../../include/vdso/time64.h"
+<span class="p">@@ -18,6 +22,15 @@</span>
+ #define KSM_MERGE_ACROSS_NODES_DEFAULT true
+ #define MB (1ul &lt;&lt; 20)
+ 
+<span class="gi">+#define PAGE_SHIFT 12
++#define HPAGE_SHIFT 21
++
++#define PAGE_SIZE (1 &lt;&lt; PAGE_SHIFT)
++#define HPAGE_SIZE (1 &lt;&lt; HPAGE_SHIFT)
++
++#define PAGEMAP_PRESENT(ent)	(((ent) &amp; (1ull &lt;&lt; 63)) != 0)
++#define PAGEMAP_PFN(ent)	((ent) &amp; ((1ull &lt;&lt; 55) - 1))
++
+</span> struct ksm_sysfs {
+ 	unsigned long max_page_sharing;
+ 	unsigned long merge_across_nodes;
+<span class="p">@@ -34,6 +47,7 @@</span> enum ksm_test_name {
+ 	CHECK_KSM_ZERO_PAGE_MERGE,
+ 	CHECK_KSM_NUMA_MERGE,
+ 	KSM_MERGE_TIME,
+<span class="gi">+	KSM_MERGE_TIME_HUGE_PAGES,
+</span> 	KSM_COW_TIME
+ };
+ 
+<span class="p">@@ -99,6 +113,9 @@</span> static void print_help(void)
+ 	       " -U (page unmerging)\n"
+ 	       " -P evaluate merging time and speed.\n"
+ 	       "    For this test, the size of duplicated memory area (in MiB)\n"
+<span class="gi">+	       "    must be provided using -s option\n"
++				 " -H evaluate merging time and speed of area allocated mostly with huge pages\n"
++	       "    For this test, the size of duplicated memory area (in MiB)\n"
+</span> 	       "    must be provided using -s option\n"
+ 	       " -C evaluate the time required to break COW of merged pages.\n\n");
+ 
+<span class="p">@@ -416,6 +433,101 @@</span> static int check_ksm_numa_merge(int mapping, int prot, int timeout, bool merge_a
+ 	return KSFT_FAIL;
+ }
+ 
+<span class="gi">+int64_t allocate_transhuge(void *ptr, int pagemap_fd)
++{
++	uint64_t ent[2];
++
++	/* drop pmd */
++	if (mmap(ptr, HPAGE_SIZE, PROT_READ | PROT_WRITE,
++				MAP_FIXED | MAP_ANONYMOUS |
++				MAP_NORESERVE | MAP_PRIVATE, -1, 0) != ptr)
++		errx(2, "mmap transhuge");
++
++	if (madvise(ptr, HPAGE_SIZE, MADV_HUGEPAGE))
++		err(2, "MADV_HUGEPAGE");
++
++	/* allocate transparent huge page */
++	*(volatile void **)ptr = ptr;
++
++	if (pread(pagemap_fd, ent, sizeof(ent),
++			(uintptr_t)ptr &gt;&gt; (PAGE_SHIFT - 3)) != sizeof(ent))
++		err(2, "read pagemap");
++
++	if (PAGEMAP_PRESENT(ent[0]) &amp;&amp; PAGEMAP_PRESENT(ent[1]) &amp;&amp;
++	    PAGEMAP_PFN(ent[0]) + 1 == PAGEMAP_PFN(ent[1]) &amp;&amp;
++	    !(PAGEMAP_PFN(ent[0]) &amp; ((1 &lt;&lt; (HPAGE_SHIFT - PAGE_SHIFT)) - 1)))
++		return PAGEMAP_PFN(ent[0]);
++
++	return -1;
++}
++
++static int ksm_merge_hugepages_time(int mapping, int prot, int timeout, size_t map_size)
++{
++	void *map_ptr, *map_ptr_orig;
++	struct timespec start_time, end_time;
++	unsigned long scan_time_ns;
++	int pagemap_fd, n_normal_pages, n_huge_pages;
++
++	map_size *= MB;
++	size_t len = map_size;
++
++	len -= len % HPAGE_SIZE;
++	map_ptr_orig = mmap(NULL, len + HPAGE_SIZE, PROT_READ | PROT_WRITE,
++			MAP_ANONYMOUS | MAP_NORESERVE | MAP_PRIVATE, -1, 0);
++	map_ptr = map_ptr_orig + HPAGE_SIZE - (uintptr_t)map_ptr_orig % HPAGE_SIZE;
++
++	if (map_ptr_orig == MAP_FAILED)
++		err(2, "initial mmap");
++
++	if (madvise(map_ptr, len + HPAGE_SIZE, MADV_HUGEPAGE))
++		err(2, "MADV_HUGEPAGE");
++
++	pagemap_fd = open("/proc/self/pagemap", O_RDONLY);
++	if (pagemap_fd &lt; 0)
++		err(2, "open pagemap");
++
++	n_normal_pages = 0;
++	n_huge_pages = 0;
++	for (void *p = map_ptr; p &lt; map_ptr + len; p += HPAGE_SIZE) {
++		if (allocate_transhuge(p, pagemap_fd) &lt; 0)
++			n_normal_pages++;
++		else
++			n_huge_pages++;
++	}
++	printf("Number of normal pages:    %d\n", n_normal_pages);
++	printf("Number of huge pages:    %d\n", n_huge_pages);
++
++	memset(map_ptr, '*', len);
++
++	if (clock_gettime(CLOCK_MONOTONIC_RAW, &amp;start_time)) {
++		perror("clock_gettime");
++		goto err_out;
++	}
++	if (ksm_merge_pages(map_ptr, map_size, start_time, timeout))
++		goto err_out;
++	if (clock_gettime(CLOCK_MONOTONIC_RAW, &amp;end_time)) {
++		perror("clock_gettime");
++		goto err_out;
++	}
++
++	scan_time_ns = (end_time.tv_sec - start_time.tv_sec) * NSEC_PER_SEC +
++		       (end_time.tv_nsec - start_time.tv_nsec);
++
++	printf("Total size:    %lu MiB\n", map_size / MB);
++	printf("Total time:    %ld.%09ld s\n", scan_time_ns / NSEC_PER_SEC,
++	       scan_time_ns % NSEC_PER_SEC);
++	printf("Average speed:  %.3f MiB/s\n", (map_size / MB) /
++					       ((double)scan_time_ns / NSEC_PER_SEC));
++
++	munmap(map_ptr_orig, len + HPAGE_SIZE);
++	return KSFT_PASS;
++
++err_out:
++	printf("Not OK\n");
++	munmap(map_ptr_orig, len + HPAGE_SIZE);
++	return KSFT_FAIL;
++}
++
+</span> static int ksm_merge_time(int mapping, int prot, int timeout, size_t map_size)
+ {
+ 	void *map_ptr;
+<span class="p">@@ -541,7 +653,7 @@</span> int main(int argc, char *argv[])
+ 	bool merge_across_nodes = KSM_MERGE_ACROSS_NODES_DEFAULT;
+ 	long size_MB = 0;
+ 
+<span class="gd">-	while ((opt = getopt(argc, argv, "ha:p:l:z:m:s:MUZNPC")) != -1) {
+</span><span class="gi">+	while ((opt = getopt(argc, argv, "ha:p:l:z:m:s:MUZNPCH")) != -1) {
+</span> 		switch (opt) {
+ 		case 'a':
+ 			prot = str_to_prot(optarg);
+<span class="p">@@ -595,6 +707,9 @@</span> int main(int argc, char *argv[])
+ 		case 'P':
+ 			test_name = KSM_MERGE_TIME;
+ 			break;
+<span class="gi">+		case 'H':
++			test_name = KSM_MERGE_TIME_HUGE_PAGES;
++			break;
+</span> 		case 'C':
+ 			test_name = KSM_COW_TIME;
+ 			break;
+<span class="p">@@ -647,6 +762,14 @@</span> int main(int argc, char *argv[])
+ 		ret = ksm_merge_time(MAP_PRIVATE | MAP_ANONYMOUS, prot, ksm_scan_limit_sec,
+ 				     size_MB);
+ 		break;
+<span class="gi">+	case KSM_MERGE_TIME_HUGE_PAGES:
++		if (size_MB == 0) {
++			printf("Option '-s' is required.\n");
++			return KSFT_FAIL;
++		}
++		ret = ksm_merge_hugepages_time(MAP_PRIVATE | MAP_ANONYMOUS, prot,
++				ksm_scan_limit_sec, size_MB);
++		break;
+</span> 	case KSM_COW_TIME:
+ 		ret = ksm_cow_time(MAP_PRIVATE | MAP_ANONYMOUS, prot, ksm_scan_limit_sec,
+ 				   page_size);
+<span class="gd">-- 
+</span><span class="p">2.25.1
+</span></code></pre></div></div>]]></content><author><name>Pedro Demarchi Gomes</name></author><category term="kernel-linux" /><summary type="html"><![CDATA[1 Introduction]]></summary></entry><entry><title type="html">Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)</title><link href="/2024-08-29/ksm" rel="alternate" type="text/html" title="Desenvolvendo um teste de desempenho para o Kernel Samepage Merging (KSM)" /><published>2024-08-29T16:56:13-03:00</published><updated>2024-08-29T16:56:13-03:00</updated><id>/2024-08-29/ksm</id><content type="html" xml:base="/2024-08-29/ksm"><![CDATA[<h1 id="1-introdução">1 Introdução</h1>
 
 <p>Esse relatório apresenta o projeto de contribuição para o Kernel Linux desenvolvido durante a disciplina MO806A.</p>
 
